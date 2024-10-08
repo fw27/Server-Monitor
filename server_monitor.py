@@ -124,9 +124,9 @@ class ServerMonitor(QMainWindow):
 
     def setup_search_bar(self):
         search_layout = QHBoxLayout()
-        search_label = QLabel("Pesquisar:")
+        search_label = QLabel(_("Search:"))
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("Digite para pesquisar servidores...")
+        self.search_input.setPlaceholderText(_("Type to search servers..."))
         self.search_input.textChanged.connect(self.filter_servers)
         search_layout.addWidget(search_label)
         search_layout.addWidget(self.search_input)
@@ -153,15 +153,15 @@ class ServerMonitor(QMainWindow):
         self.refresh_indicator = QLabel()
         header_layout.addWidget(self.refresh_indicator)
 
-        refresh_all_button = QPushButton("Refresh All")
+        refresh_all_button = QPushButton(_("Refresh All"))
         refresh_all_button.clicked.connect(self.refresh_all_servers)
         header_layout.addWidget(refresh_all_button)
 
-        configure_ti_button = QPushButton("Configure IT")
+        configure_ti_button = QPushButton(_("Configure IT"))
         configure_ti_button.clicked.connect(self.open_ti_config)
         header_layout.addWidget(configure_ti_button)
 
-        add_server_button = QPushButton("Add Server")
+        add_server_button = QPushButton(_("Add Server"))
         add_server_button.clicked.connect(self.open_add_server_dialog)
         header_layout.addWidget(add_server_button)
 
@@ -169,10 +169,10 @@ class ServerMonitor(QMainWindow):
 
     def setup_theme_selector(self):
         theme_layout = QHBoxLayout()
-        theme_label = QLabel("Theme:")
+        theme_label = QLabel(_("Theme:"))
         self.theme_selector = QComboBox()
-        self.theme_selector.addItems(["Light", "Dark", "Blue"])
-        self.theme_selector.setCurrentText("Light")
+        self.theme_selector.addItems([_("Light"), _("Dark"), _("Blue")])
+        self.theme_selector.setCurrentText(_("Light"))
         self.theme_selector.currentTextChanged.connect(self.change_theme)
         theme_layout.addWidget(theme_label)
         theme_layout.addWidget(self.theme_selector)
@@ -254,7 +254,11 @@ class ServerMonitor(QMainWindow):
             json.dump(config, f)
 
     def change_theme(self, theme):
-        theme_map = {"Claro": "light", "Escuro": "dark", "Azul": "blue"}
+        theme_map = {
+            "Light": "light", "Claro": "light",
+            "Dark": "dark", "Escuro": "dark",
+            "Blue": "blue", "Azul": "blue"
+        }
         self.apply_theme(theme_map[theme])
 
     def apply_theme(self, theme):
@@ -440,7 +444,7 @@ class ServerWidget(QFrame):
         users_layout = QHBoxLayout()
         users_icon = QLabel()
         users_icon.setPixmap(QIcon(f"{ICON_PATH}users.svg").pixmap(QSize(24, 24)))
-        users_label = QLabel("Técnicos Conectados:")
+        users_label = QLabel(_("Connected IT:"))
         users_layout.addWidget(users_icon)
         users_layout.addWidget(users_label)
         users_layout.addStretch()
@@ -469,7 +473,7 @@ class ServerWidget(QFrame):
         processes_layout = QHBoxLayout()
         processes_icon = QLabel()
         processes_icon.setPixmap(QIcon(f"{ICON_PATH}services.svg").pixmap(QSize(24, 24)))
-        processes_label = QLabel("Processos Monitorados:")
+        processes_label = QLabel(_("Monitored Processes:"))
         processes_layout.addWidget(processes_icon)
         processes_layout.addWidget(processes_label)
         processes_layout.addStretch()
@@ -483,7 +487,7 @@ class ServerWidget(QFrame):
         services_layout = QHBoxLayout()
         services_icon = QLabel()
         services_icon.setPixmap(QIcon(f"{ICON_PATH}services.svg").pixmap(QSize(24, 24)))
-        services_label = QLabel("Serviços Monitorados:")
+        services_label = QLabel(_("Monitored Services:"))
         services_layout.addWidget(services_icon)
         services_layout.addWidget(services_label)
         services_layout.addStretch()
@@ -495,22 +499,22 @@ class ServerWidget(QFrame):
         self.update_services_list()
 
         button_layout = QHBoxLayout()
-        self.refresh_button = QPushButton("Atualizar")
+        self.refresh_button = QPushButton(_("Update"))
         self.refresh_button.setIcon(QIcon(f"{ICON_PATH}refresh.svg"))
         self.refresh_button.clicked.connect(self.refresh_users)
         button_layout.addWidget(self.refresh_button)
 
-        self.delete_button = QPushButton("Excluir")
+        self.delete_button = QPushButton(_("Delete"))
         self.delete_button.setIcon(QIcon(f"{ICON_PATH}delete.svg"))
         self.delete_button.clicked.connect(self.delete_server)
         button_layout.addWidget(self.delete_button)
 
-        self.monitor_processes_button = QPushButton("Processos")
+        self.monitor_processes_button = QPushButton(_("Processes"))
         self.monitor_processes_button.setIcon(QIcon(f"{ICON_PATH}monitor.svg"))
         self.monitor_processes_button.clicked.connect(self.open_monitor_processes_dialog)
         button_layout.addWidget(self.monitor_processes_button)
 
-        self.monitor_services_button = QPushButton("Serviços")
+        self.monitor_services_button = QPushButton(_("Services"))
         self.monitor_services_button.setIcon(QIcon(f"{ICON_PATH}monitor.svg"))
         self.monitor_services_button.clicked.connect(self.open_monitor_services_dialog)
         button_layout.addWidget(self.monitor_services_button)
@@ -531,7 +535,7 @@ class ServerWidget(QFrame):
 
     def refresh_users(self):
         self.users_list.clear()
-        self.users_list.addItem("Carregando...")
+        self.users_list.addItem("Loading...")
         self.worker.start()
 
     def update_users(self, users, running_processes, running_services):
@@ -610,7 +614,7 @@ class ServerWidget(QFrame):
             self.ti_icon_label.setPixmap(icon_pixmap)
             self.ti_icon_label.setFixedSize(16, 16)  # Fix the size of the icon
 
-            warning_text = f"TI detectado: {', '.join(detected_ti)}"
+            warning_text = f"{_('IT detected:')} {', '.join(detected_ti)}"
             self.ti_warning_label.setText(warning_text)
 
             self.ti_warning_widget.show()
@@ -618,8 +622,8 @@ class ServerWidget(QFrame):
             self.ti_warning_widget.hide()
 
     def delete_server(self):
-        reply = QMessageBox.question(self, 'Confirmar Exclusão',
-                                     f"Tem certeza que deseja excluir o servidor '{self.name}'?",
+        reply = QMessageBox.question(self, _('Confirm Deletion'),
+                                     f"{_('Are you sure you want to delete the server')} '{self.name}'?",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.parent.remove_server(self.name)
@@ -668,14 +672,14 @@ class QwinstaWorker(QThread):
             if result.stdout:  # Check if there's any output
                 users = [line.split()[1] for line in result.stdout.splitlines()[1:] if "rdp-tcp#" in line.lower()]
             else:
-                users = ["Sem saída do servidor"]
+                users = ["No server response."]
 
             running_processes = self.check_processes()
             running_services = self.check_services()
             self.finished.emit(users, running_processes, running_services)
 
         except Exception as e:
-            self.finished.emit([f"Erro: {str(e)}"], [], [])
+            self.finished.emit([f"Error: {str(e)}"], [], [])
 
     def check_processes(self):
         running_processes = []
@@ -705,7 +709,7 @@ class QwinstaWorker(QThread):
 class TIConfigDialog(QDialog):
     def __init__(self, ti_users, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Configurar Usuários TI")
+        self.setWindowTitle(_("Configure IT Users"))
         self.layout = QVBoxLayout(self)
 
         self.ti_users_list = QListWidget()
@@ -715,11 +719,11 @@ class TIConfigDialog(QDialog):
         self.new_user_input = QLineEdit()
         self.layout.addWidget(self.new_user_input)
 
-        add_button = QPushButton("Adicionar Usuário")
+        add_button = QPushButton(_("Add User"))
         add_button.clicked.connect(self.add_user)
         self.layout.addWidget(add_button)
 
-        remove_button = QPushButton("Remover Usuário Selecionado")
+        remove_button = QPushButton(_("Remove Selected User"))
         remove_button.clicked.connect(self.remove_user)
         self.layout.addWidget(remove_button)
 
@@ -746,14 +750,14 @@ class TIConfigDialog(QDialog):
 class AddServerDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Adicionar Servidor")
+        self.setWindowTitle(_("Add Server"))
         self.layout = QFormLayout(self)
 
         self.name_input = QLineEdit()
         self.ip_input = QLineEdit()
 
-        self.layout.addRow("Nome do Servidor:", self.name_input)
-        self.layout.addRow("IP do Servidor:", self.ip_input)
+        self.layout.addRow(_("Server Name:"), self.name_input)
+        self.layout.addRow(_("Server IP:"), self.ip_input)
 
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.accepted.connect(self.accept)
@@ -767,7 +771,7 @@ class AddServerDialog(QDialog):
 class MonitorProcessesDialog(QDialog):
     def __init__(self, processes, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Monitorar Processos")
+        self.setWindowTitle(_("Monitor Processes"))
         self.layout = QVBoxLayout(self)
 
         self.processes_list = QListWidget()
@@ -777,11 +781,11 @@ class MonitorProcessesDialog(QDialog):
         self.new_process_input = QLineEdit()
         self.layout.addWidget(self.new_process_input)
 
-        add_button = QPushButton("Adicionar Processo")
+        add_button = QPushButton(_("Add Process"))
         add_button.clicked.connect(self.add_process)
         self.layout.addWidget(add_button)
 
-        remove_button = QPushButton("Remover Processo Selecionado")
+        remove_button = QPushButton(_("Remove Selected Process"))
         remove_button.clicked.connect(self.remove_process)
         self.layout.addWidget(remove_button)
 
@@ -808,7 +812,7 @@ class MonitorProcessesDialog(QDialog):
 class MonitorServicesDialog(QDialog):
     def __init__(self, services, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Monitorar Serviços")
+        self.setWindowTitle(_("Monitor Services"))
         self.layout = QVBoxLayout(self)
 
         self.services_list = QListWidget()
@@ -818,11 +822,11 @@ class MonitorServicesDialog(QDialog):
         self.new_service_input = QLineEdit()
         self.layout.addWidget(self.new_service_input)
 
-        add_button = QPushButton("Adicionar Serviço")
+        add_button = QPushButton(_("Add Service"))
         add_button.clicked.connect(self.add_service)
         self.layout.addWidget(add_button)
 
-        remove_button = QPushButton("Remover Serviço Selecionado")
+        remove_button = QPushButton(_("Remove Selected Service"))
         remove_button.clicked.connect(self.remove_service)
         self.layout.addWidget(remove_button)
 
